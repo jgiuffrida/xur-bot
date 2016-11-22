@@ -1,2 +1,2 @@
 # xur-bot
-Xur Slackbot using Skellington11
+Xur Slackbot built with [Skellington](https://github.com/colestrode/skellington)
