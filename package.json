@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/jgiuffrida/xur-bot#readme",
   "dependencies": {
+    "moment": "^2.17.0",
     "skellington": "^1.0.0"
   }
 }
