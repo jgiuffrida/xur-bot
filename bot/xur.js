@@ -18,9 +18,9 @@ class Xur {
             let dayOfWeek = moment().day();
             if (dayOfWeek > 5 || dayOfWeek === 0) { // This needs to be more granular, check hours, xur is in the tower fri 9a - sun 9a
                 // it's the freakin' weekend baby i'm about to have me some xur
-                return res('He\'s probably in the reef?');
+                return res('I\'m probably in the reef?');
             } else {
-                return res('He\'s not currently around, check back friday'); 
+                return res('I\'m not currently around, check back friday'); 
             }
 
         });
