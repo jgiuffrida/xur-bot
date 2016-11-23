@@ -4,7 +4,7 @@ const Xur = require('./xur');
 
     module.exports = {
         init: function (controller, bot) {
-            new Xur(controller, bot);
+            let xur = new Xur(controller, bot);
         }
 
     };

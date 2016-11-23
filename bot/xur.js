@@ -5,7 +5,9 @@ const moment = require('moment');
 class Xur {
     constructor(controller, bot) {
         controller.hears(['where are you?'], ['direct_message','direct_mention','mention'], (bot, message) => {
-            bot.reply(message, this.getLocation());
+            this.getLocation().then( (txt) => {
+                bot.reply(message, txt);
+            });
         });
     }
 
@@ -16,12 +18,14 @@ class Xur {
             let dayOfWeek = moment().day();
             if (dayOfWeek > 5 || dayOfWeek === 0) { // This needs to be more granular, check hours, xur is in the tower fri 9a - sun 9a
                 // it's the freakin' weekend baby i'm about to have me some xur
-                res('He\'s probably in the reef?');
+                return res('He\'s probably in the reef?');
             } else {
-                res('He\'s not currently around, check back friday'); 
+                return res('He\'s not currently around, check back friday'); 
             }
 
         });
     }
 
 }
+
+module.exports = Xur;
