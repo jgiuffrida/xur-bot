@@ -16,6 +16,35 @@ class Advisors {
                 bot.reply(message, nf);
             })
         });
+
+         controller.hears(['heroic strike'], ['direct_mention','direct_message'], (bot, message) => {
+            this.heroicstrike(this.data).then((heroicstrike) => {
+                bot.reply(message, heroicstrike);
+            })
+        });
+
+        controller.hears(['daily mission'], ['direct_mention','direct_message'], (bot, message) => {
+            this.dailymission(this.data).then((daily) => {
+                bot.reply(message, daily);
+            })
+        });
+
+        controller.hears(['daily crucible'], ['direct_mention','direct_message'], (bot, message) => {
+            this.dailycrucible(this.data).then((daily) => {
+                bot.reply(message, daily);
+            })
+        });
+        controller.hears(['weekly crucible'], ['direct_mention','direct_message'], (bot, message) => {
+            this.weeklycrucible(this.data).then((weeklycrucible) => {
+                bot.reply(message, weeklycrucible);
+            })
+        });
+
+        controller.hears(['bust it'], ['direct_mention','direct_message'], (bot, message) => {
+            this.getData(true).then( () => {
+                bot.reply(message, 'https://halloweenshindig.files.wordpress.com/2015/06/gb_bustin1.gif');
+            });
+        });
     }
 
     getData(bustCache) {
@@ -102,19 +131,52 @@ class Advisors {
     }
 
     heroicstrike(data) {
-
+        let id = _.get(data, 'heroicstrike.display.activityHash', '');
+        let message = 'This weeks heroic strike playlist:\n\n';
+        return this.fetchActivity(id).then(
+            (rawactivity) => {
+                let activity = _.get(rawactivity, 'Response.data.activity', {});
+                message += '*'+_.get(activity, 'activityName', 'Unknown')+'*'+'\n\n';
+                message += '*Modifiers*: \n'+this.skullList(_.get(data, 'heroicstrike.extended.skullCategories',[]));
+                return message;
+            }
+        );
     }
 
     dailymission(data) {
-
+        let id = _.get(data, 'dailychapter.display.activityHash', '');
+        let message = 'Today\'s daily mission:\n\n';
+        return this.fetchActivity(id).then(
+            (rawactivity) => {
+                let activity = _.get(rawactivity, 'Response.data.activity', {});
+                message += '*'+_.get(activity, 'activityName', 'Unknown')+'*'+'\n\n';
+                return message;
+            }
+        );
     }
 
     dailycrucible(data) {
-
+        let id = _.get(data, 'dailycrucible.display.activityHash', '');
+        let message = 'Daily Crucible is: ';
+        return this.fetchActivity(id).then(
+            (rawactivity) => {
+                let activity = _.get(rawactivity, 'Response.data.activity', {});
+                message += '*'+_.get(activity, 'activityName', 'Unknown')+'*'+'\n\n';
+                return message;
+            }
+        );
     }
 
     weeklycrucible(data) {
-
+        let id = _.get(data, 'weeklycrucible.display.activityHash', '');
+        let message = 'Weekly Crucible is: ';
+        return this.fetchActivity(id).then(
+            (rawactivity) => {
+                let activity = _.get(rawactivity, 'Response.data.activity', {});
+                message += '*'+_.get(activity, 'activityName', 'Unknown')+'*'+'\n\n';
+                return message;
+            }
+        );
     }
 
     xur(data) {
