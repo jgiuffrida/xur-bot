@@ -2,6 +2,7 @@
 
 const moment = require('moment');
 
+
 class Xur {
     constructor(controller, bot) {
         controller.hears(['where are you?'], ['direct_message','direct_mention','mention'], (bot, message) => {
