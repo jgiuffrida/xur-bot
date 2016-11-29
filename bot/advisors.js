@@ -1,3 +1,5 @@
+"use strict";
+
 const fetch = require('./fetch');
 const process = require('process');
 const _ = require('lodash');
@@ -36,9 +38,22 @@ class Advisors {
                 bot.reply(message, daily);
             })
         });
+
         controller.hears(['weekly crucible'], ['direct_mention','direct_message'], (bot, message) => {
             this.weeklycrucible(this.data).then((weeklycrucible) => {
                 bot.reply(message, weeklycrucible);
+            })
+        });
+
+        controller.hears(['poe', 'prison of elders'], ['direct_mention','direct_message'], (bot, message) => {
+            this.poe(this.data).then((poe) => {
+                bot.reply(message, poe);
+            })
+        });
+
+        controller.hears(['coe', 'elder challenge', 'challenge of the elders'], ['direct_mention','direct_message'], (bot, message) => {
+            this.coe(this.data).then((coe) => {
+                bot.reply(message, coe);
             })
         });
 
@@ -85,7 +100,7 @@ class Advisors {
             (rawactivity) => {
                 let activity = _.get(rawactivity, 'Response.data.activity', {});
                 let attachments = _.concat(
-                    [{ 
+                    [{
                         'title': 'Strike',
                         'text': _.get(activity, 'activityName', 'Unknown'),
                         'fallback': 'Strike'+_.get(activity, 'activityName', 'Unknown')
@@ -159,11 +174,33 @@ class Advisors {
     }
 
     poe(data) {
-
+      let id = _.get(data, 'prisonofelders.display.activityHash', '');
+      let message = 'Prison of Elders is: ';
+      return this.fetchActivity(id).then(
+          (rawactivity) => {
+              let activity = _.get(rawactivity, 'Response.data.activity', {});
+              message += '*'+_.get(activity, 'activityName', 'Unknown')+'*'+'\n\n';
+              return message;
+          }
+      );
     }
 
     coe(data) {
-
+      let id = _.get(data, 'elderchallenge.display.activityHash', '');
+      return this.fetchActivity(id).then(
+          (rawactivity) => {
+              let activity = _.get(rawactivity, 'Response.data.activity', {});
+              let attachments = _.concat(
+                  [
+                    {'title': 'Challenge of the Elders'}
+                  ],
+                  this.skullList(_.get(data, 'elderchallenge.extended.skullCategories',[]))
+              );
+              return {
+                  'attachments': attachments
+              };
+          }
+      );
     }
 }
 

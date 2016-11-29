@@ -1,3 +1,5 @@
+"use strict";
+
 const sqlite = require('sqlite3');
 const process = require('process');
 const http = require('http');
