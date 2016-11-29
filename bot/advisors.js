@@ -68,20 +68,29 @@ class Advisors {
     }
 
     skullList(modifiers) {
-        return _(_.get(modifiers, '[0].skulls', [])).map((skull) => {
-            return '*'+skull.displayName+'*'+'\n'+skull.description+'\n\n';
-        }).value().join(' ');
+        return _.map(_.get(modifiers, '[0].skulls', []), (skull) => {
+            return {
+                fallback: '*'+skull.displayName+'*'+'\n'+skull.description+'\n\n',
+                title: skull.displayName,
+                text: skull.description,
+                color: 'danger'
+                // thumb_url: 'https://www.bungie.net'+skull.icon
+            };
+        });
     }
 
     nightfall(data) {
         let id = _.get(data, 'nightfall.display.activityHash', '');
-        let message = 'This weeks nightfall:\n\n';
         return this.fetchActivity(id).then(
             (rawactivity) => {
                 let activity = _.get(rawactivity, 'Response.data.activity', {});
-                message += '*'+_.get(activity, 'activityName', 'Unknown')+'*'+'\n\n';
-                message += '*Modifiers*: \n'+this.skullList(_.get(data, 'nightfall.extended.skullCategories',[]));
-                return message;
+                let attachments = _.concat(
+                    [{ 'text': 'Strike: *'+_.get(activity, 'activityName', 'Unknown')+'*' }],
+                    this.skullList(_.get(data, 'nightfall.extended.skullCategories',[]))
+                );
+                return {
+                    'attachments': attachments
+                };
             }
         );
     }
@@ -92,13 +101,15 @@ class Advisors {
 
     heroicstrike(data) {
         let id = _.get(data, 'heroicstrike.display.activityHash', '');
-        let message = 'This weeks heroic strike playlist:\n\n';
+        let message = '';
         return this.fetchActivity(id).then(
             (rawactivity) => {
                 let activity = _.get(rawactivity, 'Response.data.activity', {});
-                message += '*'+_.get(activity, 'activityName', 'Unknown')+'*'+'\n\n';
-                message += '*Modifiers*: \n'+this.skullList(_.get(data, 'heroicstrike.extended.skullCategories',[]));
-                return message;
+                message += 'This week\'s weekly heroic is: *'+_.get(activity, 'activityName', 'Unknown')+'*'+'\n\n';
+                return {
+                    'text': message,
+                    'attachments': this.skullList(_.get(data, 'heroicstrike.extended.skullCategories',[]))
+                };
             }
         );
     }
