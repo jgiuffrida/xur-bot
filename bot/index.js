@@ -14,6 +14,15 @@ const Manifest = require('./manifest');
                 let xur = new Xur(controller, bot, manifest);
                 let advisors = new Advisors(manifest);
                 advisors.init(controller, bot);
+
+                controller.hears(['refresh manifest'], ['direct_message'], (bot, message) => {
+                    bot.reply('Refreshing destiny item db');
+                    manifest.setup().then( () => {
+                        bot.reply(message, 'db refreshed');
+                    }).catch((err) => {
+                        bot.reply(message, 'Something bad happened');
+                    });
+                });
             });
         }
     };
