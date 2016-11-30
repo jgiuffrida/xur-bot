@@ -192,7 +192,7 @@ class Advisors {
               let activity = _.get(rawactivity, 'Response.data.activity', {});
               let attachments = _.concat(
                   [
-                    {'title': 'Challenge of the Elders'}
+                    {'title': 'Challenge of the Elders', 'fallback': 'Challenge of the Elders'}
                   ],
                   this.skullList(_.get(data, 'elderchallenge.extended.skullCategories',[]))
               );
