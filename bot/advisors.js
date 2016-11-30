@@ -87,7 +87,8 @@ class Advisors {
                 let attachments = _.concat(
                     [{ 
                         'title': 'Strike',
-                        'text': _.get(activity, 'activityName', 'Unknown') 
+                        'text': _.get(activity, 'activityName', 'Unknown'),
+                        'fallback': 'Strike'+_.get(activity, 'activityName', 'Unknown')
                     }],
                     this.skullList(_.get(data, 'nightfall.extended.skullCategories',[]))
                 );
