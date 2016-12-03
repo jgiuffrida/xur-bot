@@ -6,62 +6,29 @@ const _ = require('lodash');
 
 class Advisors {
     constructor() {
-        this.data = null;
-        this.lastFetch = null;
-
         this.fetchActivity = fetch.curryType('Activity');
+        this.fetchItem = fetch.curryType('InventoryItem');
+    }
+    
+    getAndReply(fn) {
+        return (bot, message) => {
+            return this.getData(true)
+                .then((data) => fn(data))
+                .then((txt) => {
+                    bot.reply(message, txt);
+                });
+        };
     }
 
     init(controller, bot) {
-        this.getData(true);
-
-        controller.hears(['nightfall'], ['direct_mention','direct_message'], (bot, message) => {
-            this.nightfall(this.data).then((nf) => {
-                bot.reply(message, nf);
-            })
-        });
-
-         controller.hears(['heroic strike', 'weekly heroic'], ['direct_mention','direct_message'], (bot, message) => {
-            this.heroicstrike(this.data).then((heroicstrike) => {
-                bot.reply(message, heroicstrike);
-            })
-        });
-
-        controller.hears(['daily mission'], ['direct_mention','direct_message'], (bot, message) => {
-            this.dailymission(this.data).then((daily) => {
-                bot.reply(message, daily);
-            })
-        });
-
-        controller.hears(['daily crucible'], ['direct_mention','direct_message'], (bot, message) => {
-            this.dailycrucible(this.data).then((daily) => {
-                bot.reply(message, daily);
-            })
-        });
-
-        controller.hears(['weekly crucible'], ['direct_mention','direct_message'], (bot, message) => {
-            this.weeklycrucible(this.data).then((weeklycrucible) => {
-                bot.reply(message, weeklycrucible);
-            })
-        });
-
-        controller.hears(['poe', 'prison of elders'], ['direct_mention','direct_message'], (bot, message) => {
-            this.poe(this.data).then((poe) => {
-                bot.reply(message, poe);
-            })
-        });
-
-        controller.hears(['coe', 'elder challenge', 'challenge of the elders'], ['direct_mention','direct_message'], (bot, message) => {
-            this.coe(this.data).then((coe) => {
-                bot.reply(message, coe);
-            })
-        });
-
-        controller.hears(['bust it'], ['direct_mention','direct_message'], (bot, message) => {
-            this.getData(true).then( () => {
-                bot.reply(message, 'https://halloweenshindig.files.wordpress.com/2015/06/gb_bustin1.gif');
-            });
-        });
+        controller.hears(['nightfall'], ['direct_mention','direct_message'], this.getAndReply(this.nightfall.bind(this)));
+        controller.hears(['heroic strike', 'weekly heroic'], ['direct_mention','direct_message'], this.getAndReply(this.heroicstrike.bind(this)));
+        controller.hears(['daily mission'], ['direct_mention','direct_message'], this.getAndReply(this.dailymission.bind(this)));
+        controller.hears(['daily crucible'], ['direct_mention','direct_message'], this.getAndReply(this.dailycrucible.bind(this)));
+        controller.hears(['weekly crucible'], ['direct_mention','direct_message'], this.getAndReply(this.weeklycrucible.bind(this)));
+        controller.hears(['poe', 'prison of elders'], ['direct_mention','direct_message'], this.getAndReply(this.poe.bind(this)));
+        controller.hears(['coe', 'elder challenge', 'challenge of the elders'], ['direct_mention','direct_message'], this.getAndReply(this.coe.bind(this)));
+        controller.hears(['trials', 'trails'], ['direct_mention', 'direct_message'], this.getAndReply(this.trials.bind(this)));
     }
 
     getData(bustCache) {
@@ -115,7 +82,28 @@ class Advisors {
     }
 
     trials(data) {
+        return new Promise((resolve, reject) => {
+            let attachments = [{
+                pretext: 'This week\'s trials:',
+                title: 'Map',
+                text: _.get(data, 'trials.display.flavor', 'Unknown'),
+                fallback: 'This week\'s trials map: *'+_.get(data, 'trials.display.flavor', 'Unknown')+'*'
+            }];
+            let bountyPromises = _.map(_.get(data, 'trials.bountyHashes', []), this.fetchItem.bind(this));
 
+            Promise.all(bountyPromises).then((bounties) => {
+               resolve({
+                    attachments: _.concat(attachments, [{
+                        title: 'Bounties',
+                        text: _.map(bounties, (bounty) => {
+                            let b = _.get(bounty, 'Response.data.inventoryItem');
+                            return b.itemName+'\n'+b.itemDescription;
+                        }).join('\n\n'),
+                        fallback: 'There are some bounties'
+                    }])
+               });
+            });
+        });
     }
 
     heroicstrike(data) {
@@ -167,10 +155,6 @@ class Advisors {
                 return message;
             }
         );
-    }
-
-    xur(data) {
-
     }
 
     poe(data) {
