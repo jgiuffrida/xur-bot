@@ -84,10 +84,7 @@ class Manifest {
 
     queryItem(itemHashes) {
         itemHashes = _.isArray(itemHashes) ? itemHashes : [itemHashes];
-        let convertedHashes = _.map(itemHashes, hash => hash-4294967296);
-        itemHashes = _.concat(itemHashes, convertedHashes);
-
-        let whereclause = itemHashes.join(' OR id = ');
+        let whereclause = this.buildHashClause(itemHashes);
         let sql = 'SELECT * from DestinyInventoryItemDefinition WHERE id = '+whereclause;
         return new Promise((resolve, reject) => {
 
@@ -101,6 +98,13 @@ class Manifest {
                 }
             });
         });
+    }
+
+    buildHashClause(itemHashes) {
+        let convertedHashes = _.map(itemHashes, hash => hash-4294967296);
+        let combined = _.concat(itemHashes, convertedHashes);
+
+        return combined.join(' OR id = ');
     }
 }
 

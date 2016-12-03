@@ -4,6 +4,8 @@ const moment = require('moment');
 const fetch = require('./fetch');
 const _ = require('lodash');
 
+const classTypes = ['Titan', 'Hunter', 'Warlock'];
+
 class Xur {
     constructor(controller, bot, manifest) {
         controller.hears([/where are you\??/, /what you selling?\??/], ['direct_message', 'direct_mention', 'mention'], (bot, message) => {
@@ -25,17 +27,54 @@ class Xur {
             return this.getData()
                 .then(this.parseData.bind(this))
                 .then((data) => {
-                    console.log('data',data);
                     if (!_.isEmpty(data.items)) {
-                        let message = 'I\'ve got:\n\n';
-                        message += data.items.join(', ');
-                        console.log('message', message);
-                        res(message);
+                        let itemLookup = _.keyBy(data.items, 'itemHash');
+                        let attachments = _.map(
+                            _.filter(
+                                data.categories, 
+                                (cat) => cat.categoryTitle !== 'Curios' && cat.categoryTitle !== 'Material Exchange'
+                            ),
+                            (category) => {
+                                let catAttachment = [{
+                                    fallback: category.categoryTitle,
+                                    title: category.categoryTitle,
+                                    color: 'danger'
+                                }];
+
+                                return _.concat(catAttachment, _.map(category.saleItems, (itemObj) => {
+                                    let item = itemLookup[itemObj.item.itemHash];
+                                    if(item) {
+                                        return {
+                                            fallback: item.itemName,
+                                            title: item.itemName,
+                                            text: this.buildItemText(category, item)
+                                        };
+                                    }else{
+                                        return;
+                                    }
+                                }))
+                            }
+                        );
+                        res({ attachments: _.flatten(attachments)});
                     } else {
                         res('I\'m not currently around, check back friday');
                     }
                 });
         });
+    }
+
+    buildItemText(category, item) {
+        if(category.categoryTitle === 'Weapon Ornaments') {
+            return _.first(item.itemDescription.split('\n'));
+        } else if(category.categoryTitle === 'Exotic Gear') {
+            if(classTypes[item.classType]) {
+                return classTypes[item.classType] + ' ' + item.itemTypeName;
+            }else{
+                return item.itemTypeName;
+            }
+        } else {
+            return '';
+        }
     }
 
     getData() {
@@ -44,17 +83,18 @@ class Xur {
 
     parseData(data) {
         return new Promise((resolve, reject) => {
-            let parsed = {};
+            let parsed = {
+                categories: _.get(data, 'Response.data.saleItemCategories', [])
+            };
 
-            let items = _.map(_.get(data, 'Response.data.saleItemCategories',[]), (category) => {
+            let items = _.map(parsed.categories, (category) => {
                 return _.map(_.get(category, 'saleItems', []), (saleItem) => {
                     return saleItem.item.itemHash;
                 });
             });
 
             this.manifest.queryItem(_.flatten(items)).then((items) => {
-                parsed.items = _.map(items, 'itemName');
-                console.log(parsed);
+                parsed.items = items;
                 resolve(parsed);
             });
         });
