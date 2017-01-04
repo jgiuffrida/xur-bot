@@ -23,6 +23,6 @@
     "skellington": "^1.0.0",
     "sqlite3": "^3.1.8",
     "unzip": "^0.1.11",
-    "pizza-calculator": "^1.0.1"
+    "pizza-calculator": "git+https://github.com/clickclickonsal/pizza-calculator.git"
   }
 }
