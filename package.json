@@ -22,6 +22,7 @@
     "request": "^2.79.0",
     "skellington": "^1.0.0",
     "sqlite3": "^3.1.8",
-    "unzip": "^0.1.11"
+    "unzip": "^0.1.11",
+    "pizza-calculator": "git+https://github.com/jgiuffrida/pizza-calculator.git#feature/bot-ability"
   }
 }
