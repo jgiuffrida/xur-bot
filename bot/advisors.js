@@ -33,7 +33,7 @@ class Advisors {
 
     getData(bustCache) {
         if(bustCache || this.data == null) {
-            return fetch(null, null, 'https://www.bungie.net/Platform/Destiny/Advisors/V2/').then(
+            return fetch(null, null, 'https://www.bungie.net/Platform/Destiny2/Advisors/V2/').then(
                 (data) => {
                     return this.parse(data);
                 }

@@ -78,7 +78,7 @@ class Xur {
     }
 
     getData() {
-        return fetch(null, null, 'https://www.bungie.net/Platform/Destiny/Advisors/Xur');
+        return fetch(null, null, 'https://www.bungie.net/Platform/Destiny2/Advisors/Xur');
     }
 
     parseData(data) {

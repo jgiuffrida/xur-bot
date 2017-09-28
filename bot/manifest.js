@@ -16,7 +16,7 @@ class Manifest {
     }
 
     fetchDbUrl() {
-        return fetch(null, null, 'https://www.bungie.net/Platform/Destiny/Manifest')
+        return fetch(null, null, 'https://www.bungie.net/Platform/Destiny2/Manifest')
             .then((res) => {
                 let path = _.get(res, 'Response.mobileWorldContentPaths.en', '');
                 this.filename = _.last(_.split(path, '/'));
