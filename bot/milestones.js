@@ -53,7 +53,7 @@ class Milestones {
     milestones(data) {
         return this.manifest.queryMilestone(data)
             .then((milestones) => {
-                return this.buildMsg(this.buildMilestones(milestones));
+                return this.buildMsg(this.parseMilestones(milestones));
             })
             .catch((err) => {
                 console.log('error errror', err);
