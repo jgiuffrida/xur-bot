@@ -86,6 +86,17 @@ class Manifest {
         itemHashes = _.isArray(itemHashes) ? itemHashes : [itemHashes];
         let whereclause = this.buildHashClause(itemHashes);
         let sql = 'SELECT * from DestinyInventoryItemDefinition WHERE id = '+whereclause;
+        return this.runQuery(sql);
+    }
+
+    queryMilestone(milestoneHashes) {
+        milestoneHashes = _.isArray(milestoneHashes) ? milestoneHashes : [milestoneHashes];
+        let whereClause = this.buildHashClause(milestoneHashes);
+        let sql = 'SELECT * from DestinyMilestoneDefinition where id = '+whereClause;
+        return this.runQuery(sql);
+    }
+
+    runQuery(sql) {
         return new Promise((resolve, reject) => {
 
             this.db.all(sql, [], (err, results) => {
